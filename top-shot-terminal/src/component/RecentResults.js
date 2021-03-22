@@ -1,10 +1,6 @@
 import React, { Component, useMemo, useState, useEffect } from "react";
-import { get } from "axios";
 import "../config";
 import * as fcl from "@onflow/fcl";
-import ResultsTable from './ResultsTable';
-import EmptyTable from './EmptyTable';
-import * as sdk from "@onflow/sdk";
 import * as types from '@onflow/types';
 
 const EVENT_MOMENT_LISTED = "A.c1e4f4f4c4257510.Market.MomentListed";
