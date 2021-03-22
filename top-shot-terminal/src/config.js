@@ -1,5 +1,5 @@
 
-import {config} from "@onflow/fcl"
+import { config } from "@onflow/fcl"
 
 config()
   .put("accessNode.api", process.env.REACT_APP_ACCESS_NODE) // Configure FCLs Access Node
