@@ -2,22 +2,20 @@ package service
 
 import (
 	"fmt"
-	"time"
-	"net/http"
-	"net/ResolveTCPAddr"
-	"net/ListenUDP"
-	"net/ResolveUDPAddr"
 	"net/DialUDP"
+	"net/ListenUDP"
+	"net/ResolveTCPAddr"
+	"net/ResolveUDPAddr"
+	"net/http"
+	"time"
 )
 
 type Client struct {
-	hub *Hub
+	hub  *Hub
 	send chan []byte
 	addr *UDPAddr
 	conn *UDPConn
 }
-
-
 
 func writePump(c *Client) {
 	defer func() {
@@ -25,11 +23,11 @@ func writePump(c *Client) {
 	}()
 	for {
 		select {
-			case message, ok := <-c.send:
-				_, err = conn.WriteTo(message, c.addr)
-				if err != nil {
-					// close client - do later
-				}
+		case message, ok := <-c.send:
+			_, err = conn.WriteTo(message, c.addr)
+			if err != nil {
+				c.hub.unregister <- client
+			}
 			// todo: add case for ticker of non response?
 		}
 	}
