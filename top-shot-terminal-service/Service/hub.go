@@ -4,17 +4,15 @@ import (
 	"github.com/onflow/flow-go-sdk/client"
 	"context"
 	"fmt"
-	"net"
-	"http"
 	"time"
 )
 
 const (
 	// time between requests to get new blocks
-	flowUpdateInterval := 10 * time.Second
+	flowUpdateInterval = 10 * time.Second
 	
 	// moment listed event id
-	listedEventId := "A.c1e4f4f4c4257510.Market.MomentListed"
+	listedEventId = "A.c1e4f4f4c4257510.Market.MomentListed"
 )
 
 type Hub struct {
@@ -39,11 +37,11 @@ func newHub() *Hub {
 		clients: make(map[*Client]bool),
 		register: make(chan *Client),
 		unregister: make(chan *Client),
-		flowEvents: make(chan Event)
+		flowEvents: make(chan Event),
 	}
 }
 
-func fetchEvents(h *Hub) {
+func (h *Hub) fetchEvents() {
 	// get the latest sealed block
 	latestBlock, err := client.GetLatestBlock(context.Background(), true)
 	if err != nil {
@@ -91,7 +89,7 @@ func (h *Hub) run() {
 					}
 				}
 			case <- fetchEventsTicker.C:
-				go fetchEvents(h)
+				go h.fetchEvents()
 		}
 	}
 }

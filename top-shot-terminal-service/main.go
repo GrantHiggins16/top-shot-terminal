@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	"github.com/granthiggins16/top-shot-terminal-topshot-terminal-service/hub"
-	"github.com/granthiggins16/top-shot-terminal-topshot-terminal-service/client"
+	"github.com/granthiggins16/top-shot-terminal-topshot-terminal-service/Service"
+	"github.com/granthiggins16/top-shot-terminal-topshot-terminal-service/Service"
 )
 
 func main() {

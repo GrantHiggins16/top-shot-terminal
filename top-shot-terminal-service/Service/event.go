@@ -3,9 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/onflow/flow-go-sdk/cadence"
+	"github.com/onflow/cadence"
 	"github.com/onflow/flow-go-sdk/client"
-	"net/http"
 )
 
 type Event struct {
@@ -21,7 +20,7 @@ type Event struct {
 	walletAddress string
 }
 
-func NewEvent(id string, walletAddress string) *Event {
+func NewEvent(id string, walletAddress string)  *Event {
 	event := &Event{
 		id:            id,
 		walletAddress: walletAddress,
@@ -59,7 +58,7 @@ func hydrateMetadata(e *Event) {
 		let collectionRef = acct.getCapability(/public/topshotSaleCollection)!.borrow<&{Market.SalePublic}>() ?? panic("Could not borrow capability from public collection")
 		return SaleMoment(moment: collectionRef.borrowMoment(id: momentID)!,price: collectionRef.getPrice(tokenID: momentID)!)
 	      }`
-	metadataRes, err = client.ExecuteScriptAtLatestBlock(context.background(), []byte(getSaleMomentScript), []cadence.Value{
+	metadataRes, err = client.ExecuteScriptAtLatestBlock(context.Background(), []byte(getSaleMomentScript), []cadence.Value{
 		cadence.BytesToAddress(e.walletAddress.Bytes()),
 		cadence.UInt64(e.id),
 	})
