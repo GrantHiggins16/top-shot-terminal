@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -26,10 +27,10 @@ type Hub struct {
 	unregister chan *Client
 
 	// evnets to send to clients
-	flowEvents chan []Event
+	flowEvents chan *Event
 
 	// height of last queried block
-	lastBlock int
+	lastBlock uint64
 }
 
 func newHub() *Hub {
@@ -37,39 +38,44 @@ func newHub() *Hub {
 		clients: make(map[*Client]bool),
 		register: make(chan *Client),
 		unregister: make(chan *Client),
-		flowEvents: make(chan Event),
+		flowEvents: make(chan *Event),
 	}
 }
 
-func (h *Hub) fetchEvents() {
+func (h *Hub) fetchEvents(c *client.Client) {
 	// get the latest sealed block
-	latestBlock, err := client.GetLatestBlock(context.Background(), true)
+	latestBlock, err := c.GetLatestBlock(context.Background(), true)
 	if err != nil {
-		fmt.Errorf("Unable to fetch latest block %w", err)
+		fmt.Errorf("Unable to fetch latest block")
 	}
 
-	endBlockHeight := latestBlock.block.height
-	startBlockHeight := lastBlock.block.height
-	if startBlockHeight == nil {
-		startBlockHeight = latestBlock.block.height
+	endBlockHeight := latestBlock.Height
+	startBlockHeight := h.lastBlock
+	if startBlockHeight == 0 {
+		startBlockHeight = latestBlock.Height
 	}		
-	blockEvents, err := flowClient.GetEventsForHeightRange(context.Background(), client.EventRangeQuery{
-   		Type:        "A.c1e4f4f4c4257510.Market.MomentPurchased",
+	blockEvents, err := c.GetEventsForHeightRange(context.Background(), client.EventRangeQuery{
+   		Type:        listedEventId,
 		StartHeight: startBlockHeight,
 		EndHeight:   endBlockHeight,
 	}) 
 	if err != nil {
-		fmt.Printf(err)
+		fmt.Printf("Unable to fetch events from latest blocks")
 	}
 	var newEvents []Event
-	for i, eventResponse := range events {		
-		event := NewEvent(eventResponse.Fields[0], eventResponse.Fields[2])
-		h.flowEvents = append(h.flowEvents, event) 
+	for i, eventResponse := range blockEvents {		
+		event := NewEvent(eventResponse.Fields[0], eventResponse.Fields[2], endBlockHeight, c)
+		h.flowEvents <- event 
 	}
+	h.lastBlock = endBlockHeight 
 }
 
 func (h *Hub) run() {
 	fetchEventsTicker := time.NewTicker(10 * time.Second)
+	client, err := client.New("access.mainnet.nodes.onflow.org:9000", grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
 	for {
 		select {
 			case client := <-h.register:
@@ -89,7 +95,7 @@ func (h *Hub) run() {
 					}
 				}
 			case <- fetchEventsTicker.C:
-				go h.fetchEvents()
+				go h.fetchEvents(client)
 		}
 	}
 }

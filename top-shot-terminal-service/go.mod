@@ -5,4 +5,5 @@ go 1.16
 require (
 	github.com/onflow/cadence v0.14.5
 	github.com/onflow/flow-go-sdk v0.17.0
+	google.golang.org/grpc v1.31.1 // indirect
 )
