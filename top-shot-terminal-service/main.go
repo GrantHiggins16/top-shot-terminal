@@ -1,20 +1,20 @@
 package main
 
 import (
-	"github.com/onflow/flow-go-sdk/client"
-	"context"
-	"fmt"
+	"flag"
+	"log"
 	"net/http"
-	"time"
-	"github.com/granthiggins16/top-shot-terminal-topshot-terminal-service/Service"
-	"github.com/granthiggins16/top-shot-terminal-topshot-terminal-service/Service"
+
+	"github.com/granthiggins16/top-shot-terminal-topshot-terminal-service/service"
 )
 
+var addr = flag.String("addr", ":8080", "http service address")
+
 func main() {
-	hub := newHub()
-	go hub.run()
+	hub := service.NewHub()
+	go hub.Run()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		client.runWs(hub, w, r)
+		service.RunWs(hub, r)
 	})
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
