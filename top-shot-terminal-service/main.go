@@ -11,11 +11,15 @@ import (
 var addr = flag.String("addr", ":8080", "http service address")
 
 func main() {
+	fs := http.FileServer(http.Dir("../../top-shot-terminal/src/build/index.html"))
+	http.Handle("/", fs)
 	hub := service.NewHub()
 	go hub.Run()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		service.RunWs(hub, r)
+		log.Println("Connecting to ws")
+		service.RunWs(hub, w, r)
 	})
+	log.Println("http server started on :8080")
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

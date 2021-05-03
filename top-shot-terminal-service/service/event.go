@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/onflow/cadence"
@@ -97,5 +98,6 @@ func (s ListEvent) String() string {
 }
 
 func (s ListEvent) Bytes() []byte {
-	return []byte(s.String())
+	b, _ := json.Marshal(s)
+	return b
 }

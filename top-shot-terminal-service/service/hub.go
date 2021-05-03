@@ -69,7 +69,6 @@ func (h *Hub) fetchEvents(c *client.Client) {
 			if err != nil {
 				fmt.Printf("Error hydrating list event.")
 			}
-			fmt.Printf("%s", event.String())
 			h.flowEvents <- event
 		}
 	}

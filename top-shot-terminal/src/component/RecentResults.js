@@ -2,21 +2,36 @@ import React, { useState, useEffect } from "react";
 import "../config";
 
 export default function RecentResults() {
-  const [eventIds, setEventIds] = useState(new Set());
-  const [eventsDictionary, setEventsDictionary] = useState({});
+  const [events, setEvents] = useState({
+    eventIds: [],
+    eventsDictionary: {}
+  });
 
-  const events = Array.from(eventIds);
 
-  const ws = new WebSocket("ws://localhost:8080/ws");
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8080/ws");
 
-  ws.onmessage = evt => {
-    console.log(evt);
-  }
+    ws.onmessage = evt => {
+      evt = JSON.parse(evt.data);
+      const eventId = evt.Fields[0]
+      const newEvent = {
+              price: evt.Fields[6],
+              serial: evt.Fields[5]
+      };
+      events.eventsDictionary[eventId] = newEvent;
+      events.eventIds = [...events.eventIds, eventId];
+      setEvents({
+        eventIds: events.eventIds,
+        eventsDictionary: events.eventsDictionary
+      });
+    }
 
-  ws.onopen = () => {
-    // on connecting, do nothing but log it to the console
-    console.log('connected')
-  }
+    ws.onopen = () => {
+      // on connecting, do nothing but log it to the console
+      console.log('connected')
+    }
+  }, []);
+  
 
   return (
     <div className="App">
@@ -35,15 +50,15 @@ export default function RecentResults() {
           </tr>
         </thead>
         <tbody>
-          {events.map((eventId) => {
-            const event = eventsDictionary[eventId];
+          {events.eventIds.map((eventId) => {
+            const event = events.eventsDictionary[eventId];
             const momentId = eventId;
             const momentPrice = event.price;
-            const momentSeller = event.seller;
+            const momentSerial = event.serial;
             return (
               <tr>
                 <td align="left">#{momentId}</td>
-                <td align="right">#{momentSeller}</td>
+                <td align="right">#{momentSerial}</td>
                 <td align="right">#{momentPrice}</td>
               </tr>
             );
