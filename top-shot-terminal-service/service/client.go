@@ -12,17 +12,13 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 
-	// We'll need to check the origin of our connection
-	// this will allow us to make requests from our React
-	// development server to here.
-	// For now, we'll do no checking and just allow any connection
+	// For now, do no checking and allow any connection
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
 type Client struct {
 	hub  *Hub
 	send chan []byte
-	addr *net.UDPAddr
 	conn *websocket.Conn
 }
 

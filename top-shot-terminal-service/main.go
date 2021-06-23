@@ -11,7 +11,6 @@ import (
 var addr = flag.String("addr", ":8080", "http service address")
 
 func main() {
-	fs := http.FileServer(http.Dir("../../top-shot-terminal/src/build/index.html"))
 	http.Handle("/", fs)
 	hub := service.NewHub()
 	go hub.Run()
